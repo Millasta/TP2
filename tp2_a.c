@@ -116,6 +116,7 @@ void deleteLexData(TLex * _lexData) {
  */
 void printLexData(TLex * _lexData) {
     int idx;
+	printf("Nombre de symboles : %d\n\n", _lexData->nbSymboles);
     for (idx = 0; idx < _lexData->nbSymboles; idx++) {
         if (_lexData->tableSymboles[idx].type == JSON_INT_NUMBER) {
             printf("Symbole n°%d : %d, de type JSON_INT_NUMBER\n", idx, _lexData->tableSymboles[idx].val.entier);
@@ -125,6 +126,9 @@ void printLexData(TLex * _lexData) {
         }
         else if (_lexData->tableSymboles[idx].type == JSON_STRING) {
             printf("Symbole n°%d : %s, type JSON_STRING\n", idx, _lexData->tableSymboles[idx].val.chaine);
+        }
+		else if (_lexData->tableSymboles[idx].type == JSON_LEX_ERROR) {
+            printf("Symbole n°%d : %s, type JSON_LEX_ERROR\n", idx, _lexData->tableSymboles[idx].val.chaine);
         }
     }
 }
@@ -191,6 +195,26 @@ void addStringSymbolToLexData(TLex * _lexData, char * _val) {
     _lexData->nbSymboles++;
 }
 
+/**
+* \fn void addStringSymbolToLexData(TLex * _lexData, char * _val)
+* \brief fonction qui ajoute une chaine de caracteres a la table des symboles
+*
+* \param[in/out] _lexData donnees de l'analyseur lexical
+* \param[in] _val chaine a ajouter
+*/
+void addErrorSymbolToLexData(TLex * _lexData) {
+   if (_lexData->tableSymboles == NULL) {
+	   _lexData->tableSymboles = malloc(sizeof(TSymbole));
+   }
+   else {
+	   _lexData->tableSymboles = realloc(_lexData->tableSymboles, (_lexData->nbSymboles + 1) * sizeof(TSymbole));
+   }
+
+   (_lexData->tableSymboles[_lexData->nbSymboles]).type = JSON_LEX_ERROR;
+   (_lexData->tableSymboles[_lexData->nbSymboles]).val.chaine = "Error";
+   _lexData->nbSymboles++;
+}
+
 
 /**
  * \fn int lex(const char * _entree, TLex * _lexData)
@@ -237,6 +261,7 @@ int lex(TLex * _lexData) {
 			}
 
 			printf("\n");
+			addErrorSymbolToLexData(_lexData);
 			return JSON_LEX_ERROR;
 
 			break;
@@ -260,6 +285,7 @@ int lex(TLex * _lexData) {
 				return JSON_TRUE;
 			}
 
+			addErrorSymbolToLexData(_lexData);
 			return JSON_LEX_ERROR;
 
 			break;
@@ -275,6 +301,7 @@ int lex(TLex * _lexData) {
 				return JSON_FALSE;
 			}
 
+			addErrorSymbolToLexData(_lexData);
 			return JSON_LEX_ERROR;
 			break;
 		case 'n':
@@ -289,6 +316,7 @@ int lex(TLex * _lexData) {
 				return JSON_NULL;
 			}
 
+			addErrorSymbolToLexData(_lexData);
 			return JSON_LEX_ERROR;
 			break;
 		case ',':
@@ -400,11 +428,13 @@ int lex(TLex * _lexData) {
 			}
 
 			printf("\n");
+			addErrorSymbolToLexData(_lexData);
 			return JSON_LEX_ERROR;	// The sequence is not part of the above cases : the sequence is not valid
 
 			break;
 	}
 
+	addErrorSymbolToLexData(_lexData);
 	return JSON_LEX_ERROR;
 }
 
