@@ -64,6 +64,13 @@ typedef struct{
  */
 int isSep(const char _symb) {
 /****** A ECRIRE *******/
+	char separators[] = {':', ',', '{', '[', ']', '}', '"', '\0'};
+	int idx = 0;
+
+	while (separators[idx] != _symb && separators[idx] != '\0')
+		idx++;
+
+	return (separators[idx] == _symb);
 }
 
 /**
@@ -213,6 +220,28 @@ void addStringSymbolToLexData(TLex * _lexData, char * _val) {
 }
 
 /**
+ * \fn char * removeBlanks(char *str)
+ * \brief fonction qui retire les espaces et retours chariots d'une chaine de caractères
+ *
+ * \param[in/out] str chaine à traiter
+ * \return chaine traitée
+*/
+char * removeBlanks(char *str) {
+	int length = strlen(str);
+	char *tmp = (char*)malloc((length+1)*sizeof(char));
+
+	int i;
+	int j = 0;
+	for( i = 0 ; i < length ; i++) {
+		if(str[i] != ' ' && str[i] != '\n') {
+			tmp[j] = str[i];
+			j++;
+		}
+	}
+	return tmp;
+}
+
+/**
  * \fn int lex(const char * _entree, TLex * _lexData)
  * \brief fonction qui effectue l'analyse lexicale (contient le code l'automate fini)
  *
@@ -221,6 +250,36 @@ void addStringSymbolToLexData(TLex * _lexData, char * _val) {
 */
 int lex(TLex * _lexData) {
 /****** A ECRIRE *******/
+
+	switch(_lexData->startPos[0]) {
+		case '{':
+			_lexData->startPos++;
+			return JSON_LCB;
+		case '}';
+			_lexData->startPos++;
+			return JSON_RCB;
+		case '[':
+			_lexData->startPos++;
+			return JSON_LB;
+		case ']':
+			_lexData->startPos++;
+			return JSON_RB;
+		case ',':
+			_lexData->startPos++;
+			return JSON_COMMA;
+		case ':':
+			_lexData->startPos++;
+			return JSON_COLON;
+
+		//#define JSON_TRUE 1 /**< entite lexicale true */
+		//#define JSON_FALSE 2 /**< entite lexicale false */
+		//#define JSON_NULL 3 /**< entite lexicale null */
+		//#define JSON_STRING 10 /**<entite lexicale chaine de caracteres */
+		//#define JSON_INT_NUMBER 11 /**< entite lexicale nombre entier */
+		//#define JSON_REAL_NUMBER 12 /**< entite lexicale nombre reel */
+	}
+	else
+		return JSON_LEX_ERROR;
 }
 
 
