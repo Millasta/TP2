@@ -216,7 +216,6 @@ int lex(TLex * _lexData) {
 
 	switch(*_lexData->startPos) {
 		case '"':
-			//printf("\nBien ici !\n");
 			_lexData->startPos++;
 
 			printf("\nEn lecture :\t");
@@ -233,6 +232,7 @@ int lex(TLex * _lexData) {
 			_lexData->startPos++;
 
 			if (*_lexData->startPos == ',' || *_lexData->startPos == ']' || *_lexData->startPos == '}' || *_lexData->startPos == ':') {
+				addStringSymbolToLexData(_lexData, buffer);
 				return JSON_STRING;
 			}
 
@@ -325,7 +325,7 @@ int lex(TLex * _lexData) {
 			}
 
 			if (*_lexData->startPos == ',' || *_lexData->startPos == ']' || *_lexData->startPos == '}') {
-				// Add to symbols
+				addIntSymbolToLexData(_lexData, atoll(buffer));
 				return JSON_INT_NUMBER;	// Simple integer case done
 			}
 			else if (*_lexData->startPos == 'e' || *_lexData->startPos == 'E') {
@@ -334,7 +334,7 @@ int lex(TLex * _lexData) {
 				_lexData->startPos++;
 				idx++;
 
-				if (*_lexData->startPos == '-') {		// If the exp is negative
+				if (*_lexData->startPos == '-' || *_lexData->startPos == '+') {		// The sign of the exp is negative
 					printf("%c", *_lexData->startPos);
 					buffer[idx] = *_lexData->startPos;
 					_lexData->startPos++;
@@ -349,7 +349,7 @@ int lex(TLex * _lexData) {
 				}
 
 				if (*_lexData->startPos == ',' || *_lexData->startPos == ']' || *_lexData->startPos == '}') {
-					// Add to symbols
+					addIntSymbolToLexData(_lexData, atoll(buffer));
 					return JSON_INT_NUMBER;	// Exp integer case done
 				}
 			}
@@ -369,7 +369,7 @@ int lex(TLex * _lexData) {
 				}
 
 				if (*_lexData->startPos == ',' || *_lexData->startPos == ']' || *_lexData->startPos == '}') {
-					// Add to symbols
+					addRealSymbolToLexData(_lexData, atof(buffer));
 					return JSON_REAL_NUMBER;	// Simple reel case done
 				}
 				else if (*_lexData->startPos == 'e' || *_lexData->startPos == 'E') {
@@ -378,7 +378,7 @@ int lex(TLex * _lexData) {
 					_lexData->startPos++;
 					idx++;
 
-					if (*_lexData->startPos == '-') {		// If the exp is negative
+					if (*_lexData->startPos == '-' || *_lexData->startPos == '+') {		// The sign of the exp is negative
 						printf("%c", *_lexData->startPos);
 						buffer[idx] = *_lexData->startPos;
 						_lexData->startPos++;
@@ -393,7 +393,7 @@ int lex(TLex * _lexData) {
 					}
 
 					if (*_lexData->startPos == ',' || *_lexData->startPos == ']' || *_lexData->startPos == '}') {
-						// Add to symbols
+						addRealSymbolToLexData(_lexData, atof(buffer));
 						return JSON_REAL_NUMBER;	// Exp reel case done
 					}
 				}
@@ -428,7 +428,7 @@ char * removeBlanks(char * string) {
 	}
 
 	cleanString[idx2] = '\0';
-	cleanString = realloc(cleanString, sizeof(char) * (idx2+1));
+	cleanString = realloc(cleanString, sizeof(char) * (idx2 + 1));
 
 	return cleanString;
 }
@@ -441,9 +441,11 @@ int main(int argc, char *argv[]) {
 	char rawData[9999] = {0};
 	char * blanklessData;
 	int code[256];
+	int test[5000];
 	int len = 0;
 	int idx = 0;
 	TLex * lex_data;
+    char currChar;
 
 	FILE *file = fopen(argv[1], "r");
 	char currentChar = fgetc(file);
@@ -471,10 +473,6 @@ int main(int argc, char *argv[]) {
 	printf("\n\n");
 	printf("========== ANALYSE ============");
 	printf("\n\n");
-
-	/*addIntSymbolToLexData(lex_data, 10);
-	addStringSymbolToLexData(lex_data, "hello");
-	addRealSymbolToLexData(lex_data, 3.14);*/
 
 	while (code[len - 1] != JSON_LEX_ERROR && *lex_data->startPos != '\0') {
 		code[len] = lex(lex_data);
