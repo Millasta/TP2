@@ -196,11 +196,10 @@ void addStringSymbolToLexData(TLex * _lexData, char * _val) {
 }
 
 /**
-* \fn void addStringSymbolToLexData(TLex * _lexData, char * _val)
-* \brief fonction qui ajoute une chaine de caracteres a la table des symboles
+* \fn void addErrorSymbolToLexData(TLex * _lexData)
+* \brief fonction qui ajoute la chaine et le type ERROR a la table des symboles
 *
 * \param[in/out] _lexData donnees de l'analyseur lexical
-* \param[in] _val chaine a ajouter
 */
 void addErrorSymbolToLexData(TLex * _lexData) {
    if (_lexData->tableSymboles == NULL) {
