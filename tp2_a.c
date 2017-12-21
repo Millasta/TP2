@@ -251,7 +251,7 @@ int lex(TLex * _lexData) {
 			}
 
 			if (*_lexData->startPos == '\0'){
-				addErrorSymbolToLexData(_lexData); 
+				addErrorSymbolToLexData(_lexData);
 				return JSON_LEX_ERROR;
 			}
 
@@ -500,7 +500,7 @@ int main(int argc, char *argv[]) {
 	printf("========== ENTREE ============");
 	printf("\n\n");
 
-	//printf("\n%s\n", lex_data->data);
+	printf("\n%s\n", lex_data->data);
 
 	printf("\n\n");
 	printf("========== ANALYSE ============");
