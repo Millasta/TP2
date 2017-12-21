@@ -223,7 +223,7 @@ void addErrorSymbolToLexData(TLex * _lexData) {
  * \return code d'identification de l'entite lexicale trouvee
 */
 int lex(TLex * _lexData) {
-	char buffer[1024] = {0};
+	char buffer[9999] = {0};
 	char trueModel[] = {'t', 'r', 'u', 'e', '\0'};
 	char falseModel[] = {'f', 'a', 'l', 's', 'e', '\0'};
 	char nullModel[] = {'n', 'u', 'l', 'l', '\0'};
@@ -250,7 +250,10 @@ int lex(TLex * _lexData) {
 				idx++;
 			}
 
-			if (*_lexData->startPos == '\0') return JSON_LEX_ERROR;
+			if (*_lexData->startPos == '\0'){
+				addErrorSymbolToLexData(_lexData); 
+				return JSON_LEX_ERROR;
+			}
 
 			_lexData->startPos++;
 
@@ -449,7 +452,7 @@ char * removeBlanks(char * string) {
 	int idx2 = 0;
 
 	while (string[idx] != '\0') {
-		if (string[idx] != '\n' && string[idx] != '\t' && string[idx] != ' ' && string[idx] != '#') {
+		if (string[idx] != '\n' && string[idx] != '\t' && string[idx] != ' ' /*&& string[idx] != '#'*/) {
 			cleanString[idx2] = string[idx];
 			idx2++;
 		}
@@ -467,7 +470,7 @@ char * removeBlanks(char * string) {
  * \brief fonction principale
  */
 int main(int argc, char *argv[]) {
-	char rawData[9999] = {0};
+	char rawData[99999] = {0};
 	char * blanklessData;
 	int code[256];
 	int test[5000];
@@ -483,7 +486,7 @@ int main(int argc, char *argv[]) {
 		rawData[i] = currentChar;
 		currentChar = fgetc(file);
 	}
-	//printf("\n%s\n", rawData);
+	printf("\n%s\n", rawData);
 	//rawData = strdup("\"test\" : \t-36.6E-5,[null, {\"obj1\": [ {\"obj2\": 12, \"obj3\":\"text1 \\\"and\\\" text2\"},\n {\"obj4\":0.32} ], \"obj5\": true }]");
 
 	fclose(file);
@@ -497,7 +500,7 @@ int main(int argc, char *argv[]) {
 	printf("========== ENTREE ============");
 	printf("\n\n");
 
-	printf("\n%s\n", lex_data->data);
+	//printf("\n%s\n", lex_data->data);
 
 	printf("\n\n");
 	printf("========== ANALYSE ============");
