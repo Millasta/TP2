@@ -191,27 +191,6 @@ void addStringSymbolToLexData(TLex * _lexData, char * _val) {
     _lexData->nbSymboles++;
 }
 
-/**
- * \fn char * removeBlanks(char *str)
- * \brief fonction qui retire les espaces et retours chariots d'une chaine de caractères
- *
- * \param[in/out] str chaine à traiter
- * \return chaine traitée
-*/
-char * removeBlanks(char *str) {
-	int length = strlen(str);
-	char *tmp = (char*)malloc((length+1)*sizeof(char));
-
-	int i;
-	int j = 0;
-	for( i = 0 ; i < length ; i++) {
-		if(str[i] != ' ' && str[i] != '\n') {
-			tmp[j] = str[i];
-			j++;
-		}
-	}
-	return tmp;
-}
 
 /**
  * \fn int lex(const char * _entree, TLex * _lexData)
@@ -221,7 +200,7 @@ char * removeBlanks(char *str) {
  * \return code d'identification de l'entite lexicale trouvee
 */
 int lex(TLex * _lexData) {
-	char buffer[256] = {0};
+	char buffer[1024] = {0};
 	char trueModel[] = {'t', 'r', 'u', 'e', '\0'};
 	char falseModel[] = {'f', 'a', 'l', 's', 'e', '\0'};
 	char nullModel[] = {'n', 'u', 'l', 'l', '\0'};
@@ -338,7 +317,7 @@ int lex(TLex * _lexData) {
 				idx++;
 			}
 
-			while (*_lexData->startPos >= '1' && *_lexData->startPos <= '9') {
+			while (*_lexData->startPos >= '0' && *_lexData->startPos <= '9') {
 				printf("%c", *_lexData->startPos);
 				buffer[idx] = *_lexData->startPos;
 				_lexData->startPos++;
@@ -362,7 +341,7 @@ int lex(TLex * _lexData) {
 					idx++;
 				}
 
-				while (*_lexData->startPos >= '1' && *_lexData->startPos <= '9') {
+				while (*_lexData->startPos >= '0' && *_lexData->startPos <= '9') {
 					printf("%c", *_lexData->startPos);
 					buffer[idx] = *_lexData->startPos;
 					_lexData->startPos++;
@@ -380,9 +359,9 @@ int lex(TLex * _lexData) {
 				_lexData->startPos++;
 				idx++;
 
-				if (*_lexData->startPos < '1' || *_lexData->startPos > '9') return JSON_LEX_ERROR;
+				if (*_lexData->startPos < '0' || *_lexData->startPos > '9') return JSON_LEX_ERROR;
 
-				while (*_lexData->startPos >= '1' && *_lexData->startPos <= '9') {
+				while (*_lexData->startPos >= '0' && *_lexData->startPos <= '9') {
 					printf("%c", *_lexData->startPos);
 					buffer[idx] = *_lexData->startPos;
 					idx++;
@@ -406,7 +385,7 @@ int lex(TLex * _lexData) {
 						idx++;
 					}
 
-					while (*_lexData->startPos >= '1' && *_lexData->startPos <= '9') {
+					while (*_lexData->startPos >= '0' && *_lexData->startPos <= '9') {
 						printf("%c", *_lexData->startPos);
 						buffer[idx] = *_lexData->startPos;
 						_lexData->startPos++;
@@ -425,6 +404,8 @@ int lex(TLex * _lexData) {
 
 			break;
 	}
+
+	return JSON_LEX_ERROR;
 }
 
 /**
@@ -439,7 +420,7 @@ char * removeBlanks(char * string) {
 	int idx2 = 0;
 
 	while (string[idx] != '\0') {
-		if (string[idx] != '\n' && string[idx] != '\t' && string[idx] != ' ') {
+		if (string[idx] != '\n' && string[idx] != '\t' && string[idx] != ' ' && string[idx] != '#') {
 			cleanString[idx2] = string[idx];
 			idx2++;
 		}
@@ -447,7 +428,7 @@ char * removeBlanks(char * string) {
 	}
 
 	cleanString[idx2] = '\0';
-	cleanString = realloc(cleanString, sizeof(char) * idx2);
+	cleanString = realloc(cleanString, sizeof(char) * (idx2+1));
 
 	return cleanString;
 }
@@ -456,18 +437,27 @@ char * removeBlanks(char * string) {
  * \fn int main()
  * \brief fonction principale
  */
-int main() {
-	char * rawData;
+int main(int argc, char *argv[]) {
+	char rawData[9999] = {0};
 	char * blanklessData;
 	int code[256];
 	int len = 0;
 	int idx = 0;
 	TLex * lex_data;
 
-	rawData = strdup("\"test\" : \t-36.6E-5,[null, {\"obj1\": [ {\"obj2\": 12, \"obj3\":\"text1 \\\"and\\\" text2\"},\n {\"obj4\":314.32} ], \"obj5\": true }]");
+	FILE *file = fopen(argv[1], "r");
+	char currentChar = fgetc(file);
+	int i;
+	for(i = 0 ; currentChar != EOF ; i++) {
+		rawData[i] = currentChar;
+		currentChar = fgetc(file);
+	}
+	//printf("\n%s\n", rawData);
+	//rawData = strdup("\"test\" : \t-36.6E-5,[null, {\"obj1\": [ {\"obj2\": 12, \"obj3\":\"text1 \\\"and\\\" text2\"},\n {\"obj4\":0.32} ], \"obj5\": true }]");
 
+	fclose(file);
 	blanklessData = removeBlanks(rawData);
-	free(rawData);
+	//free(rawData);
 
 	lex_data = initLexData(blanklessData);
 	free(blanklessData);
