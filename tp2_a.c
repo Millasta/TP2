@@ -97,7 +97,7 @@ TLex * initLexData(char * _data) {
  * \fn void deleteLexData(TLex * _lexData)
  * \brief fonction qui supprime de la memoire les donnees pour l'analyseur lexical
  *
- * \param[in/out] _lexData donnees de l'analyseur lexical
+ * \param[in,out] _lexData donnees de l'analyseur lexical
  * \return neant
  */
 void deleteLexData(TLex * _lexData) {
@@ -120,7 +120,7 @@ void deleteLexData(TLex * _lexData) {
  * \brief fonction qui affiche les donnees pour
  * l'analyseur lexical
  *
- * \param[in] _lexData donn�es de l'analyseur lexical
+ * \param[in] _lexData donnees de l'analyseur lexical
  * \return neant
  */
 void printLexData(TLex * _lexData) {
@@ -147,7 +147,7 @@ void printLexData(TLex * _lexData) {
  * \fn void addIntSymbolToLexData(TLex * _lexData, const int _val)
  * \brief fonction qui ajoute un symbole entier a la table des symboles
  *
- * \param[in/out] _lexData donnees de l'analyseur lexical
+ * \param[in,out] _lexData donnees de l'analyseur lexical
  * \param[in] _val valeur entiere e ajouter
  * \return neant
  */
@@ -168,7 +168,7 @@ void addIntSymbolToLexData(TLex * _lexData, const int _val) {
  * \fn void addRealSymbolToLexData(TLex * _lexData, const float _val)
  * \brief fonction qui ajoute un symbole reel a la table des symboles
  *
- * \param[in/out] _lexData donnees de l'analyseur lexical
+ * \param[in,out] _lexData donnees de l'analyseur lexical
  * \param[in] _val valeur reelle a ajouter
  */
 void addRealSymbolToLexData(TLex * _lexData, const float _val) {
@@ -188,7 +188,7 @@ void addRealSymbolToLexData(TLex * _lexData, const float _val) {
  * \fn void addStringSymbolToLexData(TLex * _lexData, char * _val)
  * \brief fonction qui ajoute une chaine de caracteres a la table des symboles
  *
- * \param[in/out] _lexData donnees de l'analyseur lexical
+ * \param[in,out] _lexData donnees de l'analyseur lexical
  * \param[in] _val chaine a ajouter
  */
 void addStringSymbolToLexData(TLex * _lexData, char * _val) {
@@ -208,7 +208,7 @@ void addStringSymbolToLexData(TLex * _lexData, char * _val) {
 * \fn void addErrorSymbolToLexData(TLex * _lexData)
 * \brief fonction qui ajoute la chaine et le type ERROR a la table des symboles
 *
-* \param[in/out] _lexData donnees de l'analyseur lexical
+* \param[in,out] _lexData donnees de l'analyseur lexical
 */
 void addErrorSymbolToLexData(TLex * _lexData) {
    if (_lexData->tableSymboles == NULL) {
@@ -228,7 +228,7 @@ void addErrorSymbolToLexData(TLex * _lexData) {
 * \fn int lex(TLex * _lexData)
 * \brief fonction qui effectue l'analyse lexicale (contient le code l'automate fini)
 *
-* \param[in/out] _lexData  de suivi de l'analyse lexicale
+* \param[in,out] _lexData donnees de suivi de l'analyse lexicale
 * \return code d'identification de l'entite lexicale trouvee
 */
 int lex(TLex * _lexData) {
