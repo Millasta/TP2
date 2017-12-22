@@ -512,6 +512,7 @@ int main(int argc, char *argv[]) {
 
 	if (argc > 1) {
 		/* Lecture des données depuis le fichier indiqué en argument */
+
 		file = fopen(argv[1], "r");
 		currChar = fgetc(file);
 	
