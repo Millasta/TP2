@@ -102,12 +102,16 @@ TLex * initLexData(char * _data) {
  * \return neant
  */
 void deleteLexData(TLex * _lexData) {
+	int idx;
+
 	free(_lexData->data);
-	int i;
-	for(i = 0 ; i < _lexData->nbSymboles ; i++) {
-		if(_lexData->tableSymboles[i].type == JSON_STRING)
-			free(_lexData->tableSymboles[i].val.chaine);
+
+	for (idx = 0 ; idx < _lexData->nbSymboles ; idx++) {
+		if(_lexData->tableSymboles[idx].type == JSON_STRING) {
+			free(_lexData->tableSymboles[idx].val.chaine);
+		}
 	}
+
 	free(_lexData->tableSymboles);
 	free(_lexData);
 }
@@ -454,19 +458,40 @@ int lex(TLex * _lexData) {
 */
 char * removeBlanks(char * string) {
 	char * cleanString = malloc(sizeof(char) * strlen(string));
-	int idx = 0;
-	int idx2 = 0;
+	int strIdx = 0;
+	int resuIdx = 0;
+	int insideString = 0;
 
-	while (string[idx] != '\0') {
-		if (string[idx] != '\n' && string[idx] != '\t' && string[idx] != ' ' /*&& string[idx] != '#'*/) {
-			cleanString[idx2] = string[idx];
-			idx2++;
+	while (string[strIdx] != '\0') {
+		if (string[strIdx] == '"') {
+			if (strIdx > 0 && string[strIdx - 1] != '\\') {
+				if (insideString) {
+					insideString = 0;
+				}
+				else {
+					insideString = 1;
+				}
+			}
+			else {
+				insideString = 1;
+			}
 		}
-		idx++;
+
+		if (!insideString) {
+			if (string[strIdx] != '\n' && string[strIdx] != '\t' && string[strIdx] != ' ') {
+				cleanString[resuIdx] = string[strIdx];
+				resuIdx++;
+			}
+		}
+		else {
+			cleanString[resuIdx] = string[strIdx];
+			resuIdx++;
+		}
+		strIdx++;
 	}
 
-	cleanString[idx2] = '\0';
-	cleanString = realloc(cleanString, sizeof(char) * (idx2 + 1));
+	cleanString[resuIdx] = '\0';
+	cleanString = realloc(cleanString, sizeof(char) * (resuIdx + 1));
 
 	return cleanString;
 }
@@ -476,28 +501,32 @@ char * removeBlanks(char * string) {
  * \brief fonction principale
  */
 int main(int argc, char *argv[]) {
-	(void)(argc);
-
-	char rawData[99999] = {0};
+	char rawData[100000] = {0};
 	char * blanklessData;
-	int code[256];
 	int len = 0;
 	int idx = 0;
+	int code[200];
+    char currChar;
 	TLex * lex_data;
+	FILE * file;
 
-	FILE *file = fopen(argv[1], "r");
-	char currentChar = fgetc(file);
-	int i;
-	for(i = 0 ; currentChar != EOF ; i++) {
-		rawData[i] = currentChar;
-		currentChar = fgetc(file);
+	if (argc > 1) {
+		/* Lecture des données depuis le fichier indiqué en argument */
+		file = fopen(argv[1], "r");
+		currChar = fgetc(file);
+
+		for(idx = 0 ; currChar != EOF ; idx++) {
+			rawData[idx] = currChar;
+			currChar = fgetc(file);
+		}
+
+		fclose(file);
 	}
-	printf("\n%s\n", rawData);
-	//rawData = strdup("\"test\" : \t-36.6E-5,[null, {\"obj1\": [ {\"obj2\": 12, \"obj3\":\"text1 \\\"and\\\" text2\"},\n {\"obj4\":0.32} ], \"obj5\": true }]");
+	else {
+		strcpy(rawData, "\"test\" : \t-36.6E-5,[null, {\"obj1\": [ {\"obj2\": 12, \"obj3\":\"text1 \\\"and\\\" text2\"},\n {\"obj4\":0.32} ], \"obj5\": true }]");
+	}
 
-	fclose(file);
 	blanklessData = removeBlanks(rawData);
-	//free(rawData);
 
 	lex_data = initLexData(blanklessData);
 	free(blanklessData);
@@ -512,6 +541,7 @@ int main(int argc, char *argv[]) {
 	printf("========== ANALYSE ============");
 	printf("\n\n");
 
+	/* Analyse lexicale des données */
 	while (code[len - 1] != JSON_LEX_ERROR && *lex_data->startPos != '\0') {
 		code[len] = lex(lex_data);
 		len++;
