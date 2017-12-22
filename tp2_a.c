@@ -102,7 +102,17 @@ TLex * initLexData(char * _data) {
  * \return neant
  */
 void deleteLexData(TLex * _lexData) {
+	int idx;
+
 	free(_lexData->data);
+
+	for (idx = 0 ; idx < _lexData->nbSymboles ; idx++) {
+		if(_lexData->tableSymboles[idx].type == JSON_STRING) {
+			free(_lexData->tableSymboles[idx].val.chaine);
+		}
+	}
+
+	free(_lexData->tableSymboles);
 	free(_lexData);
 }
 
@@ -116,6 +126,7 @@ void deleteLexData(TLex * _lexData) {
  */
 void printLexData(TLex * _lexData) {
     int idx;
+	printf("Nombre de symboles : %d\n\n", _lexData->nbSymboles);
     for (idx = 0; idx < _lexData->nbSymboles; idx++) {
         if (_lexData->tableSymboles[idx].type == JSON_INT_NUMBER) {
             printf("Symbole n°%d : %d, de type JSON_INT_NUMBER\n", idx, _lexData->tableSymboles[idx].val.entier);
@@ -125,6 +136,9 @@ void printLexData(TLex * _lexData) {
         }
         else if (_lexData->tableSymboles[idx].type == JSON_STRING) {
             printf("Symbole n°%d : %s, type JSON_STRING\n", idx, _lexData->tableSymboles[idx].val.chaine);
+        }
+		else if (_lexData->tableSymboles[idx].type == JSON_LEX_ERROR) {
+            printf("Symbole n°%d : %s, type JSON_LEX_ERROR\n", idx, _lexData->tableSymboles[idx].val.chaine);
         }
     }
 }
@@ -192,10 +206,10 @@ void addStringSymbolToLexData(TLex * _lexData, char * _val) {
 }
 
 /**
- * \fn void addErrorSymbolToLexData(TLex * _lexData)
- * \brief fonction qui ajoute la chaine "Error" avec le type JSON_LEX_ERROR a la table des symboles
- *
- * \param[in/out] _lexData donnees de l'analyseur lexical
+* \fn void addErrorSymbolToLexData(TLex * _lexData)
+* \brief fonction qui ajoute la chaine et le type ERROR a la table des symboles
+*
+* \param[in/out] _lexData donnees de l'analyseur lexical
 */
 void addErrorSymbolToLexData(TLex * _lexData) {
    if (_lexData->tableSymboles == NULL) {
@@ -210,6 +224,7 @@ void addErrorSymbolToLexData(TLex * _lexData) {
    _lexData->nbSymboles++;
 }
 
+
 /**
  * \fn int lex(const char * _entree, TLex * _lexData)
  * \brief fonction qui effectue l'analyse lexicale (contient le code l'automate fini)
@@ -218,11 +233,19 @@ void addErrorSymbolToLexData(TLex * _lexData) {
  * \return code d'identification de l'entite lexicale trouvee
 */
 int lex(TLex * _lexData) {
-	char buffer[12288] = {0};
+	char buffer[9999] = {0};
 	char trueModel[] = {'t', 'r', 'u', 'e', '\0'};
 	char falseModel[] = {'f', 'a', 'l', 's', 'e', '\0'};
 	char nullModel[] = {'n', 'u', 'l', 'l', '\0'};
 	int idx = 0;
+
+	//typedef struct{
+	//	char * data; /**< chaine a parcourir */
+	//	char * startPos; /**< position de depart pour la prochaine analyse */
+	//	int nbLignes; /**< nb de lignes analysees */
+	//	TSymbole * tableSymboles; /**< tableau des symboles : chaines/entier/reel */
+	//	int nbSymboles; /**< taille du tableau tableSymboles */
+	//} TLex;
 
 	switch(*_lexData->startPos) {
 		case '"':
@@ -237,9 +260,9 @@ int lex(TLex * _lexData) {
 				idx++;
 			}
 
-			if (*_lexData->startPos == '\0') {
-				addErrorSymbolToLexData(_lexData);	
-				return JSON_LEX_ERROR;		
+			if (*_lexData->startPos == '\0'){
+				addErrorSymbolToLexData(_lexData);
+				return JSON_LEX_ERROR;
 			}
 
 			_lexData->startPos++;
@@ -249,6 +272,7 @@ int lex(TLex * _lexData) {
 				return JSON_STRING;
 			}
 
+			printf("\n");
 			addErrorSymbolToLexData(_lexData);
 			return JSON_LEX_ERROR;
 
@@ -256,12 +280,10 @@ int lex(TLex * _lexData) {
 		case '{':
 			_lexData->startPos++;
 			return JSON_LCB;
-
 			break;
 		case '}':
 			_lexData->startPos++;
 			return JSON_RCB;
-
 			break;
 		case 't':
 			printf("\nEn lecture :\t");
@@ -290,9 +312,8 @@ int lex(TLex * _lexData) {
 			if (*_lexData->startPos == ',' || *_lexData->startPos == ']' || *_lexData->startPos == '}') {
 				return JSON_FALSE;
 			}
-			
-			addErrorSymbolToLexData(_lexData);
 
+			addErrorSymbolToLexData(_lexData);
 			return JSON_LEX_ERROR;
 			break;
 		case 'n':
@@ -309,27 +330,22 @@ int lex(TLex * _lexData) {
 
 			addErrorSymbolToLexData(_lexData);
 			return JSON_LEX_ERROR;
-
 			break;
 		case ',':
 			_lexData->startPos++;
 			return JSON_COMMA;
-
 			break;
 		case '[':
 			_lexData->startPos++;
 			return JSON_LB;
-
 			break;
 		case ']':
 			_lexData->startPos++;
 			return JSON_RB;
-
 			break;
 		case ':':
 			_lexData->startPos++;
 			return JSON_COLON;
-
 			break;
 		default:
 			printf("\nEn lecture :\t");
@@ -410,7 +426,6 @@ int lex(TLex * _lexData) {
 					}
 
 					while (*_lexData->startPos >= '0' && *_lexData->startPos <= '9') {
-
 						printf("%c", *_lexData->startPos);
 						buffer[idx] = *_lexData->startPos;
 						_lexData->startPos++;
@@ -424,11 +439,15 @@ int lex(TLex * _lexData) {
 				}
 			}
 
+			printf("\n");
 			addErrorSymbolToLexData(_lexData);
 			return JSON_LEX_ERROR;	// The sequence is not part of the above cases : the sequence is not valid
 
 			break;
 	}
+
+	addErrorSymbolToLexData(_lexData);
+	return JSON_LEX_ERROR;
 }
 
 /**
@@ -439,19 +458,40 @@ int lex(TLex * _lexData) {
 */
 char * removeBlanks(char * string) {
 	char * cleanString = malloc(sizeof(char) * strlen(string));
-	int idx = 0;
-	int idx2 = 0;
+	int strIdx = 0;
+	int resuIdx = 0;
+	int insideString = 0;
 
-	while (string[idx] != '\0') {
-		if (string[idx] != '\n' && string[idx] != '\t' && string[idx] != ' ') {
-			cleanString[idx2] = string[idx];
-			idx2++;
+	while (string[strIdx] != '\0') {
+		if (string[strIdx] == '"') {
+			if (strIdx > 0 && string[strIdx - 1] != '\\') {
+				if (insideString) {
+					insideString = 0;
+				}
+				else {
+					insideString = 1;
+				}
+			}
+			else {
+				insideString = 1;
+			}
 		}
-		idx++;
+
+		if (!insideString) {
+			if (string[strIdx] != '\n' && string[strIdx] != '\t' && string[strIdx] != ' ') {
+				cleanString[resuIdx] = string[strIdx];
+				resuIdx++;
+			}
+		}
+		else {
+			cleanString[resuIdx] = string[strIdx];
+			resuIdx++;
+		}
+		strIdx++;
 	}
 
-	cleanString[idx2] = '\0';
-	cleanString = realloc(cleanString, sizeof(char) * (idx2 + 1));
+	cleanString[resuIdx] = '\0';
+	cleanString = realloc(cleanString, sizeof(char) * (resuIdx + 1));
 
 	return cleanString;
 }
@@ -460,29 +500,33 @@ char * removeBlanks(char * string) {
  * \fn int main()
  * \brief fonction principale
  */
-int main(int argc, char * argv[]) {
-	char * rawData;
+int main(int argc, char *argv[]) {
+	char rawData[100000] = {0};
 	char * blanklessData;
-	int code[512];
-	char test[147456];
 	int len = 0;
 	int idx = 0;
-	TLex * lex_data;
+	int code[200];
     char currChar;
+	TLex * lex_data;
+	FILE * file;
 
-	FILE * file = fopen("Tests/test2_err.json", "r");
-    currChar = fgetc(file);
-	for (idx = 0; currChar != EOF; idx++) {
-		test[idx] = currChar;
-		currChar = fgetc(file);	
+	if (argc > 1) {
+		/* Lecture des données depuis le fichier indiqué en argument */
+		file = fopen(argv[1], "r");
+		currChar = fgetc(file);
+	
+		for(idx = 0 ; currChar != EOF ; idx++) {
+			rawData[idx] = currChar;
+			currChar = fgetc(file);
+		}
+
+		fclose(file);
 	}
-    test[idx + 1] = '\0';
-	fclose(file);
-
-	rawData = strdup(test);
+	else {
+		strcpy(rawData, "\"test\" : \t-36.6E-5,[null, {\"obj1\": [ {\"obj2\": 12, \"obj3\":\"text1 \\\"and\\\" text2\"},\n {\"obj4\":0.32} ], \"obj5\": true }]");
+	}
 
 	blanklessData = removeBlanks(rawData);
-	free(rawData);
 
 	lex_data = initLexData(blanklessData);
 	free(blanklessData);
@@ -497,6 +541,7 @@ int main(int argc, char * argv[]) {
 	printf("========== ANALYSE ============");
 	printf("\n\n");
 
+	/* Analyse lexicale des données */
 	while (code[len - 1] != JSON_LEX_ERROR && *lex_data->startPos != '\0') {
 		code[len] = lex(lex_data);
 		len++;
