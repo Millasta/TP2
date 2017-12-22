@@ -122,7 +122,7 @@ void deleteLexData(TLex * _lexData) {
  * \brief fonction qui affiche les donnees pour
  * l'analyseur lexical
  *
- * \param[in] _lexData donn�es de l'analyseur lexical
+ * \param[in] _lexData donnees de l'analyseur lexical
  * \return neant
  */
 void printLexData(TLex * _lexData) {
