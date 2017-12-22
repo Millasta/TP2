@@ -12,7 +12,6 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include <assert.h>
-#include <stdarg.h>
 
 #define JSON_LEX_ERROR -1 /**< code d'erreur lexicale */
 #define JSON_TRUE 1 /**< entite lexicale true */
