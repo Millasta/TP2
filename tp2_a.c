@@ -228,7 +228,7 @@ void addErrorSymbolToLexData(TLex * _lexData) {
 * \fn int lex(TLex * _lexData)
 * \brief fonction qui effectue l'analyse lexicale (contient le code l'automate fini)
 *
-* \param[in/out] _lexData donnees de suivi de l'analyse lexicale
+* \param[in/out] _lexData  de suivi de l'analyse lexicale
 * \return code d'identification de l'entite lexicale trouvee
 */
 int lex(TLex * _lexData) {
