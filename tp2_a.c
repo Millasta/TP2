@@ -476,14 +476,14 @@ char * removeBlanks(char * string) {
  * \brief fonction principale
  */
 int main(int argc, char *argv[]) {
+	(void)(argc);
+
 	char rawData[99999] = {0};
 	char * blanklessData;
 	int code[256];
-	int test[5000];
 	int len = 0;
 	int idx = 0;
 	TLex * lex_data;
-    char currChar;
 
 	FILE *file = fopen(argv[1], "r");
 	char currentChar = fgetc(file);
