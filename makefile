@@ -4,12 +4,13 @@
 
 CC=gcc
 CFLAGS = -W -Wall -g
+EXEC = tp2_a
 
 tp2_a: tp2_a.c
 	$(CC) tp2_a.c -o $(EXEC) $(CFLAGS)
 
 valgrind: tp2_a
-	valgrind ./tp2_a --memory-leak=full
+	valgrind ./tp2_a
 
 valgrind-test: tp2_a
 	valgrind ./tp2_a Tests/test.json --memory-leak=full
