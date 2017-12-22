@@ -515,7 +515,7 @@ int main(int argc, char *argv[]) {
 
 		file = fopen(argv[1], "r");
 		currChar = fgetc(file);
-	
+
 		for(idx = 0 ; currChar != EOF ; idx++) {
 			rawData[idx] = currChar;
 			currChar = fgetc(file);
