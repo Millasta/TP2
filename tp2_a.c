@@ -103,6 +103,12 @@ TLex * initLexData(char * _data) {
  */
 void deleteLexData(TLex * _lexData) {
 	free(_lexData->data);
+	int i;
+	for(i = 0 ; i < _lexData->nbSymboles ; i++) {
+		if(_lexData->tableSymboles[i].type == JSON_STRING)
+			free(_lexData->tableSymboles[i].val.chaine);
+	}
+	free(_lexData->tableSymboles);
 	free(_lexData);
 }
 
