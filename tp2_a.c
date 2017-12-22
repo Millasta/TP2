@@ -94,9 +94,8 @@ TLex * initLexData(char * _data) {
 }
 
 /**
- * \fn void deleteLexData(TLex ** _lexData)
- * \brief fonction qui supprime de la memoire les donnees pour
- * l'analyseur lexical
+ * \fn void deleteLexData(TLex * _lexData)
+ * \brief fonction qui supprime de la memoire les donnees pour l'analyseur lexical
  *
  * \param[in/out] _lexData donnees de l'analyseur lexical
  * \return neant
@@ -226,11 +225,11 @@ void addErrorSymbolToLexData(TLex * _lexData) {
 
 
 /**
- * \fn int lex(const char * _entree, TLex * _lexData)
- * \brief fonction qui effectue l'analyse lexicale (contient le code l'automate fini)
- *
- * \param[in/out] _lexData donn�es de suivi de l'analyse lexicale
- * \return code d'identification de l'entite lexicale trouvee
+* \fn int lex(TLex * _lexData)
+* \brief fonction qui effectue l'analyse lexicale (contient le code l'automate fini)
+*
+* \param[in/out] _lexData donnees de suivi de l'analyse lexicale
+* \return code d'identification de l'entite lexicale trouvee
 */
 int lex(TLex * _lexData) {
 	char buffer[9999] = {0};
@@ -238,14 +237,6 @@ int lex(TLex * _lexData) {
 	char falseModel[] = {'f', 'a', 'l', 's', 'e', '\0'};
 	char nullModel[] = {'n', 'u', 'l', 'l', '\0'};
 	int idx = 0;
-
-	//typedef struct{
-	//	char * data; /**< chaine a parcourir */
-	//	char * startPos; /**< position de depart pour la prochaine analyse */
-	//	int nbLignes; /**< nb de lignes analysees */
-	//	TSymbole * tableSymboles; /**< tableau des symboles : chaines/entier/reel */
-	//	int nbSymboles; /**< taille du tableau tableSymboles */
-	//} TLex;
 
 	switch(*_lexData->startPos) {
 		case '"':
@@ -497,7 +488,7 @@ char * removeBlanks(char * string) {
 }
 
 /**
- * \fn int main()
+ * \fn int main(int argc, char *argv[])
  * \brief fonction principale
  */
 int main(int argc, char *argv[]) {
