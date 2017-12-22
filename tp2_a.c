@@ -12,6 +12,7 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <stdarg.h>
 
 #define JSON_LEX_ERROR -1 /**< code d'erreur lexicale */
 #define JSON_TRUE 1 /**< entite lexicale true */
@@ -95,7 +96,8 @@ TLex * initLexData(char * _data) {
 
 /**
  * \fn void deleteLexData(TLex * _lexData)
- * \brief fonction qui supprime de la memoire les donnees pour l'analyseur lexical
+ * \brief fonction qui supprime de la memoire les donnees pour
+ * l'analyseur lexical
  *
  * \param[in,out] _lexData donnees de l'analyseur lexical
  * \return neant
@@ -120,25 +122,29 @@ void deleteLexData(TLex * _lexData) {
  * \brief fonction qui affiche les donnees pour
  * l'analyseur lexical
  *
- * \param[in] _lexData donnees de l'analyseur lexical
+ * \param[in] _lexData donn�es de l'analyseur lexical
  * \return neant
  */
 void printLexData(TLex * _lexData) {
     int idx;
+
 	printf("Nombre de symboles : %d\n\n", _lexData->nbSymboles);
+
     for (idx = 0; idx < _lexData->nbSymboles; idx++) {
-        if (_lexData->tableSymboles[idx].type == JSON_INT_NUMBER) {
-            printf("Symbole n°%d : %d, de type JSON_INT_NUMBER\n", idx, _lexData->tableSymboles[idx].val.entier);
-        }
-        else if (_lexData->tableSymboles[idx].type == JSON_REAL_NUMBER) {
-            printf("Symbole n°%d : %f, type JSON_REAL_NUMBER\n", idx, _lexData->tableSymboles[idx].val.reel);
-        }
-        else if (_lexData->tableSymboles[idx].type == JSON_STRING) {
-            printf("Symbole n°%d : %s, type JSON_STRING\n", idx, _lexData->tableSymboles[idx].val.chaine);
-        }
-		else if (_lexData->tableSymboles[idx].type == JSON_LEX_ERROR) {
-            printf("Symbole n°%d : %s, type JSON_LEX_ERROR\n", idx, _lexData->tableSymboles[idx].val.chaine);
-        }
+		switch (_lexData->tableSymboles[idx].type) {
+			case JSON_INT_NUMBER:
+				printf("Symbole n°%d :\t JSON_INT_NUMBER \t%d\n", idx + 1, _lexData->tableSymboles[idx].val.entier);
+				break;
+			case JSON_REAL_NUMBER:
+            	printf("Symbole n°%d :\t JSON_REAL_NUMBER \t%f\n", idx + 1, _lexData->tableSymboles[idx].val.reel);
+				break;
+			case JSON_STRING:
+            	printf("Symbole n°%d :\t JSON_STRING \t\t%s\n", idx + 1, _lexData->tableSymboles[idx].val.chaine);
+				break;
+			case JSON_LEX_ERROR:
+            	printf("Symbole n°%d :\t JSON_LEX_ERROR\n", idx + 1);
+				break;
+		}
     }
 }
 
@@ -225,11 +231,11 @@ void addErrorSymbolToLexData(TLex * _lexData) {
 
 
 /**
-* \fn int lex(TLex * _lexData)
-* \brief fonction qui effectue l'analyse lexicale (contient le code l'automate fini)
-*
-* \param[in,out] _lexData donnees de suivi de l'analyse lexicale
-* \return code d'identification de l'entite lexicale trouvee
+ * \fn int lex(TLex * _lexData)
+ * \brief fonction qui effectue l'analyse lexicale (contient le code l'automate fini)
+ *
+ * \param[in,out] _lexData donnees de suivi de l'analyse lexicale
+ * \return code d'identification de l'entite lexicale trouvee
 */
 int lex(TLex * _lexData) {
 	char buffer[9999] = {0};
@@ -263,7 +269,6 @@ int lex(TLex * _lexData) {
 				return JSON_STRING;
 			}
 
-			printf("\n");
 			addErrorSymbolToLexData(_lexData);
 			return JSON_LEX_ERROR;
 
@@ -430,7 +435,6 @@ int lex(TLex * _lexData) {
 				}
 			}
 
-			printf("\n");
 			addErrorSymbolToLexData(_lexData);
 			return JSON_LEX_ERROR;	// The sequence is not part of the above cases : the sequence is not valid
 
@@ -524,13 +528,13 @@ int main(int argc, char *argv[]) {
 	free(blanklessData);
 
 	printf("\n\n");
-	printf("========== ENTREE ============");
+	printf("==========       ENTREE       ============");
 	printf("\n\n");
 
 	printf("\n%s\n", lex_data->data);
 
 	printf("\n\n");
-	printf("========== ANALYSE ============");
+	printf("========== SUIVI DE L'ANALYSE ============");
 	printf("\n\n");
 
 	/* Analyse lexicale des données */
@@ -540,7 +544,7 @@ int main(int argc, char *argv[]) {
 	}
 
 	printf("\n\n");
-	printf("========== ANALYSE LEXICALE TERMINEE ============");
+	printf("==========      RESULTAT      ============");
 	printf("\n\n");
 
 	if (*lex_data->startPos == '\0') {
@@ -558,7 +562,7 @@ int main(int argc, char *argv[]) {
 	printf("%d", code[len - 1]);
 
     printf("\n\n");
-    printf("========== TABLE DES SYMBOLES ==========");
+    printf("==========  TABLE DES SYMBOLES  ==========");
     printf("\n\n");
 
     printLexData(lex_data);
