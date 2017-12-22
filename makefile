@@ -3,7 +3,7 @@
 # MAURICE Valentin
 
 CC=gcc
-CFLAGS = -W -Wall -g -std=c99
+CFLAGS = -W -Wall -g -std=gnu99
 EXEC = tp2_a
 
 tp2_a: tp2_a.c
